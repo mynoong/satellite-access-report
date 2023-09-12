@@ -1,18 +1,21 @@
-function julianDate = toJulianDate( dateString, timeUTHours )
-%TOJULIANDATE Answer the Julian date corresponding to a date string
-%and a UT time in hours
-%
-%Example: if dateString='29-Jan-2011' and timeUTHours = 17, then
-% julianDate = 2455591.208333
+function julianDate = toJulianDate(dateString, hoursFromUT)
+%toJulianDate gives the Julian date from a date string
+%(dd-mmm-yyyy hh:mm:ss) at desired location - and hoursFromUT 
+%(time difference from UT) must be given
+
+% Ex) if dateString = '26-Mar-2003 13:15:00' and hoursFromUT = 9, 
+% then julianDate = 2452724.677083
 
 if nargin < 2
-    timeUTHours = 0;
+    hoursFromUT = 0;
 end
 
 if nargin < 1
-    dateString = datestr( date );
+    dateString = '10-Sep-2023 00:00:00'
 end
 
-deltaDays = datenum( dateString ) - datenum( '29-Jan-2011' );
-julianDate = 2455590.500000 + deltaDays + timeUTHours/24;
+t = datetime(dateString, 'InputFormat', 'dd-mmm-yyyy hh:mm:ss');
+deltaDays = datenum(t) - datenum('26-Mar-2003');
+julianDate = 2452724.500000 + deltaDays + hoursFromUT/24;
 
+end
