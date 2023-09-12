@@ -1,4 +1,4 @@
-function q = qRepresentation(axis, angle)
+function q = qRotation(axis, angle)
 %qRotation gives the quaternion representation of rotation given by
 %axis (3-vector) and angle (degrees)
 
