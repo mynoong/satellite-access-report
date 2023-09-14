@@ -1,23 +1,22 @@
-function theta = trueAnomalyFromMeanAnomaly( ecc, MArray )
+function theta = meanAnomalyToTrueAnomaly(e, MArray)
 
 % Solution of Kepler's equation for time since periapsis
-eccStar = ecc * 180/pi;
+eStar = e * 180 / pi;
 tol = 1.0e-6; 
 
-for i=1:length(MArray)
+for i = 1:length(MArray)
     M = MArray(i);
-    M = -180 + mod( M + 180, 360 );
+    M = -180 + mod(M + 180, 360);
     
-    E = M + eccStar * sind(M);
+    E = M + eStar * sind(M);
     DeltaM = 1.0e10;
     while abs(DeltaM) > tol
-      DeltaM = M - ( E - eccStar*sind(E) );
-      DeltaE = DeltaM / ( 1 - ecc*cosd(E) );
+      DeltaM = M - (E - eStar*sind(E));
+      DeltaE = DeltaM / (1 - e*cosd(E));
       E = E + DeltaE;
     end
-
-    cosE = cosd(E);
-    cosTheta = ( cosE - ecc ) / ( 1 - ecc*cosE );
+    
+    cosTheta = (cosd(E) - e) / (1 - e * cosd(E));
     theta(i) = sign(E) * acosd(cosTheta);
 end
 
