@@ -9,5 +9,6 @@ elseif length(v) == 3
 else
   disp('[getQFromVec] v cannot be transformed into quaternion format!')
   disp(v)
+end
   
 end
