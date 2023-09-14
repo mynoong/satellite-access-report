@@ -1,5 +1,5 @@
-function q = qRotation(axis, angle)
-%qRotation gives the quaternion representation of rotation given by
+function q = rotationAsQ(axis, angle)
+%rotationAsQ gives the quaternion representation of rotation given by
 %axis (3-vector) and angle (degrees)
 
 axis = reshape(axis, [1,3]); % Reshape into a row vector
