@@ -16,6 +16,6 @@ end
 
 t = datetime(dateString, 'InputFormat', 'dd-mmm-yyyy hh:mm:ss');
 deltaDays = datenum(t) - datenum('26-Mar-2003');
-julianDate = 2452724.500000 + deltaDays + hoursFromUT/24;
+julianDate = 2452724.500000 + deltaDays - hoursFromUT/24;
 
 end
