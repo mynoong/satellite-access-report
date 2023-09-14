@@ -1,17 +1,22 @@
-function tArray = timeSincePeriapsis(thetaArray, a, e, mu)
+function tArray = timeSincePeriapsis(thetaArray, a, e, mu, dn)
 % timeSincePeriapsis gives the time taken for orbiting degrees of 
 % true anomaly since periapsis
 % thetaArray: True anomaly in degrees (can be array)
 % a: Semimajor axis
 % e: eccentricity        
 % mu: Gravitational parameter, in same units as a
+% dn: change in mean motion due to oblateness of the center planet/star
+%     (related to J2 perturbation)
+
+if nargin < 5
+  dn = 0;
+end
 
 if nargin < 4
   mu = physicalConstant('muEarth');
 end
 
-a = abs(a); 
-n = sqrt(mu / (abs(a))^3); % mean motion
+n = sqrt(mu / (abs(a))^3) + dn; % mean motion
 
 for i = 1:length(thetaArray)
   theta = thetaArray(i);
