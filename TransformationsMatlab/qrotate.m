@@ -1,52 +1,50 @@
-function vr = qrotate( v, Q )
-%QROTATE Rotate v using quaternion Q
-% v can be a matrix where each column is a vector to be rotated
-% Q can be a matrix where each row is a quaternion
-%   In this case each vector is rotated with different quaternion
+function vecResult = qrotate(v, Q)
+% qrotate gives the vector vec after rotating vector v, using quaternion Q
 
-sv = size(v);
-nr = sv(1);
-if nr == 1
-  v = v'; % Change a row vector into a column vector
-elseif nr ~= 3
-  v = v';
-end
+% v can be either a single vector or 
+% a matrix in which each row is a vector to be rotated.
+% Q can be either a single quaterninon or 
+% a matrix in which each row is a quaternion for rotation.
+% If both v and Q are a matrix, they must have the same number of rows, 
+% and each vector is rotated with different quaternion.
+% If v is a matrix, but Q is a single quaternion,
+% all vectors in v are rotated with Q.
 
-sv = size(v);
-nr = sv(1);
-nc = sv(2);
-if nr ~= 3
-  disp( 'qrotate: Must have three elements in vector! Aborting' );
-  return
-end
+vsize = size(v);
+vrow = vsize(1);
+vcol = vsize(2);
+Qsize = size(Q);
+Qrow = Qsize(1);
+Qcol = Qsize(2);
 
-sQ = size( Q );
-nqr = sQ(1);
-nqc = sQ(2);
-if nqc ~= 4
-  disp( 'qrotate: Quaternion must have 4 columns! Aborting' );
+if vcol ~= 3
+  disp('[qrotate] Vector must have three elements.');
   return;
 end
-if (nqr ~= 1) && (nqr ~= nc)
-  disp( ['qrotate: Quaternion matrix must have #rows equal to #vectors. ' ...
-         'Aborting!'] );
+if Qcol ~= 4
+  disp('[qrotate] Quaternion must have four elements.');
+  return;
+end
+if (Qrow ~= 1) && (Qrow ~= vrow)
+  disp('[qrotate] Vector matrix and quaternion matrix must have ...
+          the same number of rows.');
   return;
 end
 
-vr = zeros( sv );
 
-Qc = qconj( Q );
+vecResult = zeros(vsize);
 
-for ic = 1:nc
-  vec = v(:,ic); % vec is the ic'th column vector
-  if nqr > 1
-    q = Q(ic,:); % take the ic'th row of Q
+for i = 1:vrow
+  vec = v(i, :); % vec is the vector to be rotated from the matrix v
+  if Qrow > 1
+    quat = Q(i, :); % quat is the quaternion used for rotation
   else
-    q = Q;
+    quat = Q; % same quat is applied if Q is a single quaternion
   end
-  qc = qconj( q );
-  vecrot = qprod( q, qprod( vec, qc ) );
-  vr(:,ic) = vecrot(1:3); % Put the rotated column vector in the output
+
+  qconj = conjugateOfQ(quat);
+  qvec = qproduct(q, qproduct(vec, qconj)); % rotation
+  vecResult(i, :) = qvec(1:3); % extracts a vector part from quaternion
 end
 
 end
