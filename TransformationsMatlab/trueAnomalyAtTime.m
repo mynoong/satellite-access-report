@@ -1,37 +1,34 @@
-function theta = trueAnomalyAtTime( tSincePeriapsis, a, ecc, mu, dn )
+function theta = trueAnomalyAtTime(tSincePeriapsis, a, e, mu, dn)
 
-n = sqrt( mu / a^3 ); % Uncorrected mean motion
-if nargin > 4
-    n = n + dn; % Add J2 correction if supplied
+if nargin < 5
+    dn = 0;
 end
-P = 2*pi / n; % Period of orbit
+n = sqrt(mu / (abs(a)^3)) + dn; % true anomaly with correction dn
 
-theta = zeros( size(tSincePeriapsis ) );
+tsize = size(tSincePeriapsis);
+theta = zeros(tsize);
 
-t = -P/2 + mod( tSincePeriapsis + P/2, P );
+P = 2 * pi / n; % period of orbit
+t = -P/2 + mod(tSincePeriapsis + P/2, P);
 Ms = 360 * t / P; % Mean anomaly in degrees
 
 % Solution of Kepler's equation for time since periapsis
-eccStar = ecc * 180/pi;
+eStar = e * 180 / pi;
 tol = 1.0e-6; 
 
-for i=1:length(t)
+for i = 1:length(t)
     M = Ms(i);
     
-    E = M + ecc * sind(M);
+    E = M + e * sind(M);
     DeltaM = 1.0e10;
     while abs(DeltaM) > tol
-        DeltaM = M - ( E - eccStar*sind(E) );
-        DeltaE = DeltaM / ( 1 - ecc*cosd(E) );
+        DeltaM = M - (E - eStar * sind(E));
+        DeltaE = DeltaM / (1 - e * cosd(E));
         E = E + DeltaE;
     end
 
-    cosE = cosd(E);
-    cosTheta = ( cosE - ecc ) / ( 1 - ecc*cosE );
+    cosTheta = (cosd(E) - ecc) / (1 - ecc * cosd(E));
     theta(i) = sign(E) * acosd(cosTheta);
 end
 
-    
-           
-       
-
+end
