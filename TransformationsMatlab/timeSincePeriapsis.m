@@ -1,79 +1,71 @@
-function timeArray = timeSincePeriapsis( thetaArray, a, ecc, mu, dn )
-%TIMESINCEPERIAPSIS Answer the time in elliptical orbit
+function tArray = timeSincePeriapsis(thetaArray, a, e, mu)
+% timeSincePeriapsis gives the time taken for orbiting degrees of 
+% true anomaly since periapsis
 % thetaArray: True anomaly in degrees (can be array)
 % a: Semimajor axis
-% ecc: eccentricity
+% e: eccentricity        
 % mu: Gravitational parameter, in same units as a
 
-% Do calculation for each value of theta given
-
-if nargin < 5
-  dn = 0;
-end
 if nargin < 4
-  mu = physicalConstant( 'muEarth' );
+  mu = physicalConstant('muEarth');
 end
 
 a = abs(a); 
-n = sqrt( mu / a^3 ) + dn; % mean motion
+n = sqrt(mu / (abs(a))^3); % mean motion
 
-T = 2*pi / n; % only meaningful if orbit is closed
+for i = 1:length(thetaArray)
+  theta = thetaArray(i);
 
-for i=1:length( thetaArray )
-
-    theta = thetaArray(i);
-    
-    if ecc > 1
-        
-        % Use formulas for hyperbolic orbit
-        
-        if theta < 0
-            sign = -1;
-            theta = -theta;
-        else
-            sign = 1;
-        end
-        F = acosh( (ecc + cosd(theta))/( 1 + ecc*cosd(theta) ) );
-        t = sign * ( ecc*sinh(F) - F ) / n;
-        
-    else
-
-        % First count how many times spacecraft has gone around already since
-        % theta=0
-        numTimes = 0;
-        while theta > 180
-            theta = theta - 360;
-            numTimes = numTimes + 1;
-        end
-
-        % Now count how many times spacecraft will go around before nu=1
-        while theta < -180
-            theta = theta + 360;
-            numTimes = numTimes - 1;
-        end
-
-        % Now theta is between -180 and 180
-        % If it is negative, make it positive but remember it was negative
-        if theta < 0
-            sign = -1;
-            theta = -theta;
-        else
-            sign = 1;
-        end
-
-        % Eccentric anomaly
-        cosEccAnom = (ecc + cosd(theta)) / ( 1 + ecc*cosd(theta));
-        EccAnom = acos( cosEccAnom ); % note: must be in radians
-
-        % Time given by formula valid from 0 to pi
-        t = ( EccAnom - ecc * sin(EccAnom) ) / n;
-
-        % Now correct in case nu was originally not between 0 and 180
-        t = sign*t + numTimes*T;
-        
+  if e > 1 % hyperbolic orbit case
+    sign = 1;
+    if theta < 0
+      sign = -1;
+      theta = -theta;
     end
 
-    timeArray(i) = t;
+    % formula for hypeerbolic eccentric anomaly in "radian"
+    F = acosh( (e + cosd(theta)) / (1 + e * cosd(theta)) );
+    t = sign * (e * sinh(F) - F) / n; % t is negative if theta < 0
+
+
+  else % elliptical orbit case
+  % Unlike hyperbolic orbit where -180 < theta < 180 degrees 
+  % is in default manner, elliptical orbit can have any real number.
+  % So the number of periods or times it orbitted are first calculated.
+      
+    nPeriods = 0
+    % counts how many times has it gone around since theta = 0, periapsis
+    while theta > 180
+      theta = theta - 360;
+      nPeriods += 1;
+    end
+    
+    % counts how many times has it gone backward since theta = 0
+    while theta < -180
+      theta = theta + 360;
+      nPeriods -= 1;
+    end
+    
+    % theta is set between -180 and 180
+    sign = 1;
+    if theta < 0 % set sign = -1 to later make t negative
+      sign = -1;
+      theta = - theta;
+    end
+
+    % formula for eccentric anomaly in "radian"
+    E = acos( (e + cosd(theta)) / (1 + e * cosd(theta)) );
+    
+    % t is negative if theta < 0. And negative theta isn't directly used
+    % because the below formula is valid for 0 <= E <= pi.
+    t = sign * (e * sin(E) - E) / n;
+
+    t = t + nPeriods * (2 * pi / n); % including # of periods
+        
+  end
+
+  tArray(i) = t;
 
 end
 
+end
