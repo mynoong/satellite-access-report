@@ -1,6 +1,6 @@
 function [dateString, hoursUT] = fromJulianDate(julianDate)
 %fromJulianDate gives the date string and UT time in hours corresponding
-%to a Julian date
+%to a Julian date (does not care about time difference among locations)
 %
 %Example: if julianDate = 2452725.208333, then dateString='26-Mar-2003' and
 %hoursUT = 17
