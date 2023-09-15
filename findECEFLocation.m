@@ -1,72 +1,68 @@
-function rECEF = findECEFLocation( elems, epoch, times )
-%FINDECEFLOCATION Find the ECEF coordinates of the spacecraft
-%location for given orbital elements defined at Julian date "epoch".
-%Answer the coordinates at each time "times" (Julian date) as a vector. 
+function rECEFArray = findECEFLocation( elems, epoch, timeArray )
+% findECEFLocation gives ECEF coordinates of spacecraft at the given time
+% (in Julian date) from times array, given orbital elements elems and
+% Julian date epoch where the elems are defined. 
+% A ECEF vector is provided at each time in timeArray.
 
 if nargin < 3
-  times = epoch; % Find nadir position at epoch, if times not given
+  times = epoch; % finds spacecraft's position at epoch without timeArray
 end
 
 mu = physicalConstant('muEarth');
 R0 = physicalConstant('R0Earth');
 J2 = physicalConstant('J2Earth');
+a = elems(1);
+e = elems(2);
+Omega0 = elems(3);
+i = elems(4);
+omega0 = elems(5);
+theta = elems(6);
+day = 86400; % 1 julian day = 86400 seconds
 
-day = 86400;
-
-rECEFArraySize = [ length(times) 3 ];
-rECEF = zeros( rECEFArraySize );
-
-e = elems;
-[ a, ecc, Omega0, inc, omega0, theta ] = deal( e(1),e(2),e(3),e(4),e(5),e(6) );
-elems;
-a;
-
-[dOmegaByDt, domegaByDt] = orbitalPerturbationRates( ...
-    mu, R0, J2, a, ecc, inc );
+[dOmegaDt, domegaDt] = orbitalPerturbationRates(mu, R0, J2, a, e, i);
                               
-P = 2*pi * sqrt( a^3 / mu ); % Orbital period in seconds
+n = sqrt(mu / (abs(a))^3); % mean motion
+P = 2 * pi / n; % Orbital period in seconds
+
 
 % Find the elapsed time between epoch and the previous periapsis passage
-tSincePeriapsisEpoch = timeSincePeriapsis( theta, a, ecc, mu ); % Seconds
+tSincePeriapsisEpoch = timeSincePeriapsis(theta, a, e, mu); % seconds
 
-for i=1:length(times)
-    
-  t = times(i);
+%Initialize rECEFArray, the output
+rECEFArraySize = [length(timeArray), 3];
+rECEFArray = zeros(rECEFArraySize);
 
-  Dt = (t - epoch) * day; % In seconds, how long since the epoch
+for i = 1:length(timeArray)
+  t = timeArray(i);
 
-  Omega = Omega0 + Dt*dOmegaByDt; % Correct for perturbations
-  omega = omega0 + Dt*domegaByDt; 
-  if 0 && i==1
-    fprintf( 'Nodal regression: total %g (rate %g deg/day)\n', Omega - Omega0, ...
-             dOmegaByDt*day ) ;
-    fprintf( 'Apsidal rotation: total %g (rate %g deg/day)\n', omega - omega0, ...
-             domegaByDt*day );
-  end
-    
+  Dt = (t - epoch) * day; % time since the epoch, in seconds
+
+  Omega = Omega0 + Dt * dOmegaDt; % Correct for perturbations
+  omega = omega0 + Dt * domegaDt; 
+
+  % Find spacecraft's location on the orbit by r and theta
+  % it does not consider the orbit's orientation yet.
   tSincePeriapsis = tSincePeriapsisEpoch + Dt;
-    
-  theta = trueAnomalyAtTime( tSincePeriapsis, a, ecc, mu );
-    
-  r = a * (1 - ecc^2 ) / (1 + ecc * cosd(theta) );
-  rvecOrbit = [ r * cosd(theta), r * sind(theta), 0 ]';
-  % rvecOrbit is the same as [ x_o, y_o, z_o ] in the notes
+  theta = trueAnomalyAtTime(tSincePeriapsis, a, e, mu);
+  r = a * (1 - e^2) / (1 + e * cosd(theta));
+  rvecOrbit = [r * cosd(theta), r * sind(theta), 0];
 
-  % Transform to Earth-centered inertial
+  % Transform rvecOrbit to Earth-centered inertial
   orbitToECI = ...
-      qprod( rotationQZ( Omega ), ...
-             qprod( rotationQX( inc ), ...
-                    rotationQZ( omega ) ) );
-  rvecECI = qrotate( rvecOrbit, orbitToECI );
+      qprod( rotationQZ(Omega), ...
+             qprod( rotationQX(i), ...
+                    rotationQZ(omega) ) );
+  rvecECI = qrotate(rvecOrbit, orbitToECI);
 
-  % Transform to Earth-centered Earth-fixed -- here is where the time
-  % is used
-  rvecECEF = ECItoECEF( rvecECI, t );
-  rECEF( i, : ) = rvecECEF;
-    
-  %Lo(i) = atan2d( rvecECEF(2), rvecECEF(1) );
-  %La(i) = asind( rvecECEF(3) / norm(rvecECEF) );
-  %rvec(i) = r;
+  % Transform ECI to Earth-centered Earth-fixed at the given time t
+  rvecECEF = ECItoECEF(rvecECI, t);
+  
+  rECEFArray(i, :) = rvecECEF;
+
+  %in case of longitude/latitude is needed
+  %Lo(i) = atan2d(rvecECEF(2), rvecECEF(1));
+  %La(i) = asind(rvecECEF(3) / norm(rvecECEF));
+  %rArray(i) = r;
 
 end
 
