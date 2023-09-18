@@ -29,20 +29,25 @@ The core functionality relies on ECEF (Earth-Centered, Earth-Fixed) coordinates.
 1. Download satellite-access-report repositories, including TransformationsMatlab folder.
 2. Download TLE data of desired satellite and search location of a desired ground station.
 3. Add path for the repository and TransformationsMatlab folder in MATLAB.
-4. Write `accessReport( Lo, La, hoursFromUT, tleFilename, times)` in command window and run the code.
-   
-   Lo: longitude of desired ground station location (ex. for ground station at N Seoul Tower, Lo = +126.9882)
-   
-   La: latitude of desired ground station location (ex. for ground station at N Seoul Tower, La = +37.5512)
-   
-   hoursFromUT: time difference between ground station location and UTC (ex. for ground stations in South Korea, hoursFromUT = +9)
-   
-   tleFilename: TLE file name of desired satellite (ex. tleFilename = 'iss.tle')
-   
-   times: list of julian dates for observation in row vector
+4. Write `accessReport( Lo, La, hoursFromUT, tleFilename, txtFilename, times)` in command window and run the code. Parameters of the function accessReport are explained in `test.m`.)
 
  ## Example Usage
-   Take reference of `exampleUsage.m` and `
+Take reference of `test.m` and the result `accessReport_iss_Seoul.txt`.
+
+`accessReport_iss_Seoul.txt` includes ISS-accessible times and locations from September 18, 2023 midnight to September 21, 2023 midnight in Korean Standard Time (KST), observing from N Seoul Tower. 
+
+## Example Usage Result
+Here is the comparison between NASA-predicted data and my custom satellite access report data from `accessReport_iss_Seoul.txt`. 
+
+![accessReportTestDiagram](https://github.com/mynoong/satellite-access-report/assets/113654157/b9026326-300a-436e-b9d8-b78a02287d17)
+
+**Upon examining the comparison, it becomes evident that there is a discrepancy of less than 1 degree in location and less than 10 seconds in time between the two datasets.**
+
+- For your reference, the satellite access report data contains a greater number of data points compared to NASA's predictions. This disparity arises because NASA's data exclusively presents potential naked-eye observation times, taking into consideration factors such as cloud cover and other weather conditions. Conversely, the satellite access report data includes all access times, encompassing both day and night observations.
+- You could find public ISS observation data from following websites.  
+  https://spotthestation.nasa.gov/sightings/index.c, https://www.astroviewer.net/iss/en/observation.php
+
+   
 
 ---
 
