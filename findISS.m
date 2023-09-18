@@ -9,7 +9,7 @@ end
 
 R0 = physicalConstant('R0Earth');
 
-[ a, ecc, Omega, inc, omega, theta, epoch ] = readTLE( tleFilename )
+[ a, ecc, Omega, inc, omega, theta, epoch ] = readTLE( tleFilename );
 elems = [ a, ecc, Omega, inc, omega, theta ];
 
 rECEF = findECEFLocation( elems, epoch, time )

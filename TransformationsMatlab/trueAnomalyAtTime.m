@@ -3,7 +3,7 @@ function theta = trueAnomalyAtTime(tSincePeriapsis, a, e, mu, dn)
 if nargin < 5
     dn = 0;
 end
-n = sqrt(mu / (abs(a)^3)) + dn; % true anomaly with correction dn
+n = sqrt(mu / a^3) + dn; % true anomaly with correction dn
 
 tsize = size(tSincePeriapsis);
 theta = zeros(tsize);
@@ -14,11 +14,11 @@ MArray = 360 * tArray / P; % Mean anomaly in degrees
 
 % Solution of Kepler's equation for time since periapsis
 eStar = e * 180 / pi;
-tol = 1.0e-6; 
+tol = 1.0e-6;
 
-for i = 1:length(tarray)
+for i = 1:length(tArray)
     M = MArray(i);
-    
+
     E = M + e * sind(M);
     DeltaM = 1.0e10;
     while abs(DeltaM) > tol

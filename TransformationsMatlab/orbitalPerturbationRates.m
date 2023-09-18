@@ -6,7 +6,7 @@ function [dOmegaDt, domegaDt] = orbitalPerturbationRates(mu, R0, J2, a, e, i)
 %eccentricity e, and inclination i (degrees).
 
 rad = 180 / pi; % To convert radians to degrees
-n = sqrt(mu / (abs(a))^3);  % Mean motion (rad/s)
+n = sqrt(mu / a^3);  % Mean motion (rad/s)
 
 dOmegaDt = -3 * rad * n * J2 * R0^2 * cosd(i) / ( 2 * a^2 * (1 - e^2)^2 ) ;
 domegaDt = 3 * rad * n * J2 * R0^2 * (4 - 5 * sind(i)^2) / ( 4 * a^2 * (1 - e^2)^2 );

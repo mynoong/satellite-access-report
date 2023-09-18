@@ -1,9 +1,8 @@
 function accessReport(Lo, La, hoursFromUT, tleFilename, txtFilename, times)
-format long;
 
 minute = 1 / 24 / 60;
 
-if nargin < 1
+if nargin < 1 
   % Location of Seoul or N Seoul Tower
   Lo = 126.9882;
   La = 37.5512;
@@ -45,9 +44,9 @@ for time = times
   azimuth = atan2d(eastProj, northProj);
   elevation = asind(upProj / range);
 
-  if elevation >= 10.0
+  if elevation >= -30.0
    dateString = fromJulianDate(time, hoursFromUT);
-   fprintf( fileID, "%s  azimuth= %4.1f  elevation= %3.1f  range= %5.1f\n", ...
+   fprintf( fileID, "%s  azimuth=%g elevation=%g range=%g\n", ...
              dateString, azimuth, elevation, range );
   end
 end

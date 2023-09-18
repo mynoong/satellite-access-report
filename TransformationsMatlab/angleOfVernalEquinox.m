@@ -12,8 +12,9 @@ earthTilt = physicalConstant('earthTilt');
 % reference time: March 17, 2021, 12:08:17.2 UT
 
 % Earth's coordinate in heliocentric ecliptic at the reference time
-HELo = 176.8287; 
+HELo = 176.8287;
 HELa = 0.0001;
+timeOfSunSouthing = 12*3600 + 8*60 + 17.2;
 
 rEarthHE = [cosd(HELa) * cosd(HELo), cosd(HELa) * sind(HELo), sind(HELa)];
 rSunHE = -rEarthHE;
@@ -25,8 +26,8 @@ alpharef = atan2d(rSunECI(2), rSunECI(1));
 % Second, add angles from reference time to the given Julian date using
 % the fact that Earth rotates 360 degrees in 1 sidereal day.
 % t: # of seconds since the reference time
-t = (tJulian - 2459291.005755) * 86400;
+t = (tJulian - 2459290.500000) * 86400;
 
-alpha = alpharef + 360 * t / siderealDay; 
+alpha = alpharef + 360 * (t - timeOfSunSouthing) / siderealDay;
 
 end

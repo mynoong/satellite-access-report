@@ -25,7 +25,7 @@ e = eccentricityFromTLE();
 omega = numFromCellArray(fields2(6));
 
 M = numFromCellArray(fields2(7));
-theta = trueAnomalyFromMeanAnomaly(e, M);
+theta = meanAnomalyToTrueAnomaly(e, M);
 
 nRevsPerDay = numFromCellArray(fields2(8));
 a = semimajorAxisFromRevsPerDay(nRevsPerDay);
@@ -59,16 +59,16 @@ J2 = physicalConstant("J2Earth");
 R0 = physicalConstant("R0Earth");
 mu = physicalConstant("muEarth");
 
-P = 86400 / nRevsPerDay; 
+P = 86400 / nRevsPerDay;
 n0 = 2 * pi / P;
 a0 = ( mu * (P / (2*pi))^2 )^(1/3);
 dn = 3 * n0 * J2 * R0^2 * (3 * cosd(i)^2 - 1) / (4 * a0^2 *(1 - e^2)^1.5);
-n = n0 + dn; 
+n = n0 + dn;
 a = (mu / n^2)^(1/3);
 end
 
 end
 
-    
+
 
 

@@ -5,7 +5,7 @@ function rECEFArray = findECEFLocation( elems, epoch, timeArray )
 % A ECEF vector is provided at each time in timeArray.
 
 if nargin < 3
-  timeArray = epoch; % finds spacecraft's position at epoch without timeArray
+  times = epoch; % finds spacecraft's position at epoch without timeArray
 end
 
 mu = physicalConstant('muEarth');
@@ -32,8 +32,8 @@ tSincePeriapsisEpoch = timeSincePeriapsis(theta, a, e, mu); % seconds
 rECEFArraySize = [length(timeArray), 3];
 rECEFArray = zeros(rECEFArraySize);
 
-for k = 1:length(timeArray)
-  t = timeArray(k);
+for i = 1:length(timeArray)
+  t = timeArray(i);
 
   Dt = (t - epoch) * day; % time since the epoch, in seconds
 
@@ -51,13 +51,13 @@ for k = 1:length(timeArray)
   orbitToECI = ...
       qproduct( rotationAsQZ(Omega), ...
              qproduct( rotationAsQX(i), ...
-                    rotationAsQZ(omega) ) );
-  rvecECI = qrotate(rvecOrbit, orbitToECI);
+                    rotationAsQZ(omega) ) )
+  rvecECI = qrotate(rvecOrbit, orbitToECI)
 
   % Transform ECI to Earth-centered Earth-fixed at the given time t
-  rvecECEF = ECItoECEF(rvecECI, t);
+  rvecECEF = ECItoECEF(rvecECI, t)
 
-  rECEFArray(k, :) = rvecECEF;
+  rECEFArray(i, :) = rvecECEF
 
   %in case of longitude/latitude is needed
   %Lo(i) = atan2d(rvecECEF(2), rvecECEF(1));

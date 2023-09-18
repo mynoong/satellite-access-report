@@ -12,7 +12,7 @@ N0 = [0, 0, 1];
 E0 = [0, 1, 0];
 U0 = [1, 0, 0];
 
-q = qprod( qrotationZ(Lo), qrotationY(-La) );
+q = qproduct( rotationAsQZ(Lo), rotationAsQY(-La) );
 
 N = qrotate( N0, q );
 E = qrotate( E0, q );
